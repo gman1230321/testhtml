@@ -1,0 +1,703 @@
+<html><head>
+      <meta charset="UTF-8">
+      <title>RF Solutions Diagnostics Portal</title>
+      <link rel="stylesheet" type="text/css" href="css/mystyle.css">
+      <script src="node_modules/jquery/dist/jquery.js"></script>
+   </head>
+   <body bgcolor="ffffff">
+      <img src="img/logo-1.png" alt="RF Solutions Logo">
+      <h1 class="MyEdit">RAU Diagnostic Portal</h1>
+
+<!--    <div class="container" id="george" >
+      <div class="led-fault">
+         <div class="led-green"></div>
+            <p>Fault LED</p>
+         </div>
+	  <div class="led-online">
+         <div class="led-green"></div>
+            <p>On-Line LED</p>
+      </div>
+      <div class="led-active">
+         <div class="led-red"></div>
+            <p id="myP">Active LED</p>
+      </div>
+      <div class="led-offhook">
+         <div class="led-blue"></div>
+            <p>Off-Hook LED</p>
+      </div>
+      <div class="led-transmit">
+         <div class="led-blue"></div>
+            <p>Transmit LED</p>
+      </div>
+    </div>      -->
+
+      <!-- Trigger/Open The Modal
+      <button id="myBtn">Open Modal</button> -->
+
+    <div id="includeTable"><br>
+<!-- The Modal -->
+<div id="myModal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+         <span class="close">×</span>
+         <h2>Data Submitted</h2>
+    </div>
+  <div class="modal-body">
+<!-- filled in by script below  <p>Some text in the Modal Body</p>
+             <p>Some other text...</p>   -->
+  </div>
+     <div class="modal-footer">
+         <h3>Rf Solutions</h3>
+     </div>
+  </div>
+</div>
+
+<h2>System Information</h2>
+<table style="width:75%">
+  <tbody><tr>
+    <th>System Name</th>
+    <th>Serial Number</th>
+    <th>EH Period</th>
+    <th>SNMP Trap IP</th>
+    <th>SMTP Source Addr</th>
+    <th>SMTP Dest. Addr</th>
+    <th>Low Pwr Thresh</th>
+    <th>VSWR Thresh</th>
+    <th>Temp. Thresh</th>
+    <th>Battery State</th>
+    <th>Expected Num DRCs</th>
+  </tr>
+  <tr>
+    <td class="mySystName">Queens</td>
+    <td class="mySerNum">1000011</td>
+    <td class="myEhPeriod">1</td>
+    <td class="myTrapIp">4.3.2.1</td>
+    <td class="mySmtpSourceAddr">RAU@rf-solutions.com</td>
+    <td class="mySmtpDestAddr">SysMonitor@rf-solutions.com</td>
+    <td class="myLowPwrThresh">10</td>
+    <td class="myVswrThresh">5</td>
+    <td class="myTempThresh">38</td>
+    <td class="myBattState"> System Alarm 1 Minor Alarm 2 Distribution Alarm</td>
+    <td class="myNumConnDRCs">1</td>
+  </tr>
+</tbody></table>
+
+<br>
+<h2>Connected DRCs</h2>
+<table style="width:75%">
+  <tbody><tr>
+    <th>IP Address</th>
+    <th>Serial Number</th>
+    <th>Location</th>
+    <th>Status Ch11</th>
+    <th>Status Ch12</th>
+  </tr>
+  <tr>
+    <td class="ipAddr"></td>
+    <td class="serNum"></td>
+    <td class="location"></td>
+    <td class="status11"></td>
+    <td class="status12"></td>
+  </tr>
+  <tr>
+    <td class="ipAddr"></td>
+    <td class="serNum"></td>
+    <td class="location"></td>
+    <td class="status11"></td>
+    <td class="status12"></td>
+  </tr>
+  <tr>
+    <td class="ipAddr"></td>
+    <td class="serNum"></td>
+    <td class="location"></td>
+    <td class="status11"></td>
+    <td class="status12"></td>
+  </tr>
+  <tr>
+    <td class="ipAddr"></td>
+    <td class="serNum"></td>
+    <td class="location"></td>
+    <td class="status11"></td>
+    <td class="status12"></td>
+  </tr>
+</tbody></table>
+<br>
+<br>
+
+<!-- Display form for entering configuration parameters -->
+<form id="myForm" action="" method="post" onsubmit="return validateRauForm();" enctype="multipart/form-data">
+  <legend>RAU Settings</legend>
+  <fieldset>
+    <label for="systName">System Name:</label>
+    <input type="text" maxlength="40" id="systName" name="mySystName" placeholder="Enter System Name">
+    <br>
+    <label for="serNum">Serial Num:</label>
+    <input type="number" max="10000000" id="serNum" name="mySerNum" placeholder="Enter serial number">
+    <br>
+    <label for="EhPeriod">EH Period:</label>
+    <input type="number" max="100000" id="EhPeriod" name="myEhPeriod" placeholder="Enter EH Period in Mins">   <!-- For External Heartbeat, in minutes -->
+    <br>
+    <label for="trapIp">SNMP Trap IP:</label>
+    <input type="text" pattern="^([0-9]{1,3}\.){3}[0-9]{1,3}$" maxlength="40" id="trapIp" name="myTrapIp" placeholder="Enter Trap IP Address">
+    <br>
+    <label for="smtpSourceAddr">SMTP Source Address:</label>
+    <input type="email" maxlength="40" id="smtpSourceAddr" name="mySmtpSourceAddr" placeholder="Enter SMTP Source Address">
+    <br>
+    <label for="smtpPassword">SMTP Source Password:</label>
+    <input type="text" maxlength="40" id="smtpPassword" name="mySmtpPassword" placeholder="Enter SMTP Source Password">
+    <br>
+    <label for="smtpDestAddr">SMTP Dest. Address:</label>
+    <input type="email" maxlength="40" id="smtpDestAddr" name="mySmtpDestAddr" placeholder="Enter SMTP Dest. Address">
+    <br>
+    <label for="lowPwrThresh">Low Power Threshold:</label>
+    <input type="number" max="100000" id="lowPwrThresh" name="myLowPwrThresh" placeholder="Enter Low Power Threshold">
+    <br>
+    <label for="vswrThresh">VSWR Threshold:</label>
+    <input type="number" max="100000" id="vswrThresh" name="myVswrThresh" placeholder="Enter VSWR Threshold">
+    <br>
+    <label for="tempThresh">Temperature Threshold:</label>
+    <input type="number" max="100000" id="tempThresh" name="myTempThresh" placeholder="Enter Temp. Threshold">
+    <br>
+    <label for="numConnDRCs">Num Conn DRCs:</label>
+    <input type="number" max="4" id="numConnDRCs" name="myNumConnDRCs" placeholder="Enter Expected Number">
+    <br>
+    <br>
+    <input type="submit" value="Submit Info">
+  </fieldset>
+</form>
+
+<h2>Percent Forward Power</h2>
+ <div class="boxed">
+  <span id="frwrdPwrDisp">1.05006105006105</span>
+ </div>
+<br>
+
+<h2>Percent Reflected Power</h2>
+ <div class="boxed">
+  <span id="rflctedPwrDisp">0.9035409035409037</span>
+ </div>
+<br>
+
+
+<script type="text/javascript">
+//    alert( 'rauTable Loading!');
+    // document.getElementsByClassName( "serNum")[0].innerHTML = 'Serial Number 1';
+    // document.getElementsByClassName( "serNum")[1].innerHTML = 'Serial Number 2';
+    const MAX_DRCs = 4;
+
+    function UpdateRauVals()          //update values for this RAU
+    {
+        var xhr = new XMLHttpRequest();
+        var dispStr = 'received: ';
+        var obj = -1;
+        var xhrSplit = null;
+
+        xhr.onreadystatechange = function()
+        {
+            if( xhr.readyState == XMLHttpRequest.DONE)
+            {
+//                 alert( "Request Done");
+                 var value = "";
+                    // alert( xhr.responseText);
+                 var ipParsed = JSON.parse( xhr.responseText);
+                 for( var key in ipParsed)
+                 {
+                     value = ipParsed[key];
+                     var newEntry = ", " + key + " " + value;     //format data for display
+                     dispStr += newEntry;
+
+                    //  if( key == 'SerialNum')
+                    //      document.getElementsByClassName( "serNum")[0].innerHTML = value;
+
+                     if( key == 'ehPeriod')
+                         document.getElementsByClassName( "myEhPeriod")[0].innerHTML = value;
+
+                     if( key == 'SerialNum')
+                         document.getElementsByClassName( "mySerNum")[0].innerHTML = value;
+
+                     if( key == 'trapIp')
+                         document.getElementsByClassName( "myTrapIp")[0].innerHTML = value;
+
+                     if( key == 'smtpDestAddr')
+                         document.getElementsByClassName( "mySmtpDestAddr")[0].innerHTML = value;
+
+                     if( key == 'smtpSourceAddr')
+                         document.getElementsByClassName( "mySmtpSourceAddr")[0].innerHTML = value;
+
+                     if( key == 'systName')
+                         document.getElementsByClassName( "mySystName")[0].innerHTML = value;
+
+                     if( key == 'lowPwrThresh')
+                         document.getElementsByClassName( "myLowPwrThresh")[0].innerHTML = value;
+
+                     if( key == 'vswrThresh')
+                         document.getElementsByClassName( "myVswrThresh")[0].innerHTML = value;
+
+                     if( key == 'tempThresh')
+                         document.getElementsByClassName( "myTempThresh")[0].innerHTML = value;
+
+                     if( key == 'battState')
+                         document.getElementsByClassName( "myBattState")[0].innerHTML = value;
+
+                     if( key == 'numConnDrc')
+                         document.getElementsByClassName( "myNumConnDRCs")[0].innerHTML = value;
+                 }
+            }
+        }
+
+        xhr.open( 'GET', "rauVals", true);
+        xhr.send( null);
+    }
+
+
+   function UpdateFrwrdPwr()          //display analog reading on browser using AJAX (no need to reload page)
+   {
+       var xhr = new XMLHttpRequest();
+       xhr.onreadystatechange = function()
+       {
+           if( xhr.readyState == XMLHttpRequest.DONE)
+           {
+//                alert( xhr.responseText);
+                  document.getElementById( "frwrdPwrDisp").innerHTML = xhr.responseText;
+           }
+       }
+
+       xhr.open( 'GET', "frwrdPwrVal", true);
+       xhr.send( null);
+   }
+
+
+   function UpdateRflctdPwr()          //display analog reading on browser using AJAX (no need to reload page)
+   {
+       var xhr = new XMLHttpRequest();
+       xhr.onreadystatechange = function()
+       {
+           if( xhr.readyState == XMLHttpRequest.DONE)
+           {
+//                alert( xhr.responseText);
+                  document.getElementById( "rflctedPwrDisp").innerHTML = xhr.responseText;
+           }
+       }
+
+       xhr.open( 'GET', "rflctedPwrVal", true);
+       xhr.send( null);
+   }
+
+
+    function UpdateDrcVals()          //update values for connected DRCs
+    {
+        var drcNum;
+        var xhr = new XMLHttpRequest();
+        var dispStr = 'received: ';
+        var obj = -1;
+        var xhrSplit = null;
+
+        xhr.onreadystatechange = function()
+        {
+            if( xhr.readyState == XMLHttpRequest.DONE)
+            {
+//                 alert( "Request Done");
+                 var value = "";
+                 if( xhr.responseText.length > 0)
+                     xhrSplit = xhr.responseText.split( '???');      //the ??? separates objects
+
+                 for( obj in xhrSplit)
+                 {
+//                     alert( xhrSplit[obj]);
+                     var ipParsed = JSON.parse( xhrSplit[obj]);
+                     for( var key in ipParsed)
+                     {
+                         value = ipParsed[key];
+                         var newEntry = ", " + key + " " + value;     //format data for display
+                         dispStr += newEntry;
+                         if( key == 'DrcNum')
+                             drcNum = value;
+
+                         if( key == 'Address')
+                             document.getElementsByClassName( "ipAddr")[drcNum].innerHTML = value;
+
+                         if( key == 'SerialNum')
+                             document.getElementsByClassName( "serNum")[drcNum].innerHTML = value;
+
+                         if( key == 'Location')
+                             document.getElementsByClassName( "location")[drcNum].innerHTML = value;
+
+                         if( key == 'Status')
+                         {
+                             if( value & 0x01)    //keyswitch 11 is on
+                                 document.getElementsByClassName( "status11")[drcNum].innerHTML = "Active";
+                             else
+                                 document.getElementsByClassName( "status11")[drcNum].innerHTML = 'Standby';
+
+                             if( value & 0x02)    //keyswitch 12 is on
+                                 document.getElementsByClassName( "status12")[drcNum].innerHTML = "Active";
+                             else
+                                 document.getElementsByClassName( "status12")[drcNum].innerHTML = 'Standby';
+                         }
+                     }
+                 }
+
+                 obj++;                          //prepare to clear remaining rows
+                 for( ; obj<MAX_DRCs; obj++)        //clear out remaining rows
+                 {
+                     document.getElementsByClassName( "ipAddr")[obj].innerHTML = "";
+                     document.getElementsByClassName( "serNum")[obj].innerHTML = "";
+                     document.getElementsByClassName( "location")[obj].innerHTML = "";
+                     document.getElementsByClassName( "status11")[obj].innerHTML = "";
+                     document.getElementsByClassName( "status12")[obj].innerHTML = "";
+                 }
+            }
+        }
+
+        xhr.open( 'GET', "drcVals", true);
+        xhr.send( null);
+    }
+
+    function validateRauForm()
+    {
+        var formPeriod = document.getElementById( "EhPeriod").value
+        var formTrapIp = document.getElementById( "trapIp").value
+        var formSmtpSourceAddr = document.getElementById( "smtpSourceAddr").value
+        var formSmtpPassword = document.getElementById( "smtpPassword").value
+        var formSmtpDestAddr = document.getElementById( "smtpDestAddr").value
+        var formSerNum = document.getElementById( "serNum").value
+        var formSystName = document.getElementById( "systName").value
+        var formLowPwrThresh = document.getElementById( "lowPwrThresh").value
+        var formVswrThresh = document.getElementById( "vswrThresh").value
+        var formTempThresh = document.getElementById( "tempThresh").value
+        var formNumConnDRCs = document.getElementById( "numConnDRCs").value
+        var dispStr = "<p>EH Period: " + formPeriod + "</p><p>Trap IP: " + formTrapIp + "</p><p>System Name: " + formSystName + "</p><p>Low Power Thresh: " + formLowPwrThresh;
+        dispStr = dispStr + "</p><p>VSWR Thresh: " + formVswrThresh + "</p><p>SMTP Dest. Address: " + formSmtpDestAddr + "</p><p>SMTP Source Address: " + formSmtpSourceAddr;
+        dispStr = dispStr + "</p><p>SMTP Source Password: " + formSmtpPassword + "</p><p>Serial Number: " + formSerNum + "</p><p>Temp Thresh: " + formTempThresh;                                                                                                                                  //just to keep lines short
+        dispStr = dispStr + "</p><p>Expected Num DRCs: " + formNumConnDRCs + "</p>";                                                                                                                                  //just to keep lines short
+        document.getElementById( "myModal").getElementsByClassName( "modal-content")[0].getElementsByClassName( "modal-body")[0].innerHTML = dispStr;
+        modal.style.display = "block";
+    }
+
+    var modal = document.getElementById( 'myModal');
+    var ipAddr=self.setInterval( UpdateRauVals, 900);   //values for this RAU, less than once per second
+    var ipAddr=self.setInterval( UpdateDrcVals, 1000);   //All connected DRCs, do this once per second
+    var ipAddr=self.setInterval( UpdateFrwrdPwr, 1100);   //forward power
+    var ipAddr=self.setInterval( UpdateRflctdPwr, 1200);   //reflected power
+</script></div>
+
+      <!-- The Modal -->
+      <div id="myModal" class="modal">
+          <div class="modal-content">
+             <div class="modal-header">
+                 <span class="close">×</span>
+                 <h2>Data Submitted</h2>
+             </div>
+             <div class="modal-body">
+<!-- filled in by script below  <p>Some text in the Modal Body</p>
+                 <p>Some other text...</p>   -->
+             </div>
+             <div class="modal-footer">
+                 <h3>Rf Solutions</h3>
+             </div>
+          </div>
+      </div>
+
+<!-- Display alarms -->
+      <h2>Alarms</h2>
+      <div class="boxed-long">
+          <span id="alarmDisp">Too Few DRCs, Tamper Switch, </span>
+      </div>
+      <br>
+      <h2>Temperature Zone 1</h2>
+      <div class="boxed">
+          <span id="analogDisp">22.9</span>
+      </div>
+      <br>
+      <br>
+
+
+      <h2>Software Version</h2>
+      <div class="boxed">
+          <span id="swVersDisp">03.09</span>
+      </div>
+      <br>
+
+      <h2>Software Update:</h2>
+<!-- Display form for file upload -->
+      <form id="file-form" action="" method="post">
+          <input type="file" id="fileSelect" name="photos" multiple="">
+          <button type="submit" id="upload-button">Upload</button>
+      </form>
+      <br>
+      <button id="restart" onclick="RestartSystem()">Restart System</button>
+
+      <br>
+      <br>
+      <br>
+      <a download="info.txt" href="/logs/info.txt">Download Log File</a>
+
+      <br>
+      <br>
+      <a download="sourceCode.zip" href="/extras/sourceCode.zip">Download Source Code</a>
+
+      <script type="text/javascript">
+          var cabType;   //cabinet type, if RAU include table of connected DRCs
+
+          var modal = document.getElementById( 'myModal');
+
+          // Get the <span> element that closes the modal
+          var span = document.getElementsByClassName( "close")[0];
+          // When the user clicks on <span> (x), close the modal
+          span.onclick = function()
+          {
+            modal.style.display = "none";
+          }
+
+          // When the user clicks anywhere outside of the modal, close it
+          window.onclick = function( event)
+          {
+            if (event.target == modal)
+            {
+               modal.style.display = "none";
+            }
+          }
+          //end modal stuff
+
+        //   function ToggleA2D()
+        //   {
+        //       if( a2dRunning == true)
+        //       {
+        //           document.getElementById( "a2d").innerHTML = "Start a2d Updates";
+        //           window.clearInterval( intrvlA2D);
+        //           a2dRunning = false;
+
+        //           //change blinking yellow led to blue
+        //           var dispStr = "<div class=" + "led-blue" + "></div><p>A2D Stopped</p>";
+        //           document.getElementsByClassName( "led-transmit").innerHTML = dispStr;
+        //       }
+        //       else
+        //       {
+        //           document.getElementById( "a2d").innerHTML = "Stop a2d Updates";
+        //           intrvlA2D=self.setInterval( UpdateA2D, 1000);
+        //           a2dRunning = true;
+
+        //           //change red led back to blinking yellow
+        //           var dispStr = "<div class=" + "led-yellow" + "></div><p>A2D Started</p>";
+        //           document.getElementsByClassName( "led-transmit").innerHTML = dispStr;
+        //       }
+        //   }
+
+          function UpdateA2D()          //display temperature reading on browser using AJAX (no need to reload page)
+          {
+              var xhr = new XMLHttpRequest();
+              xhr.onreadystatechange = function()
+              {
+                  if( xhr.readyState == XMLHttpRequest.DONE)
+                  {
+//                       alert( xhr.responseText);
+                       document.getElementById( "analogDisp").innerHTML = xhr.responseText;
+                  }
+              }
+
+              xhr.open( 'GET', "analogVal", true);
+              xhr.send( null);
+          }
+
+          function UpdateSwVers()          //display software version using AJAX (no need to reload page)
+          {
+              var xhr = new XMLHttpRequest();
+              xhr.onreadystatechange = function()
+              {
+                  if( xhr.readyState == XMLHttpRequest.DONE)
+                  {
+//                       alert( xhr.responseText);
+                       document.getElementById( "swVersDisp").innerHTML = xhr.responseText;
+                  }
+              }
+
+              xhr.open( 'GET', "swVersVal", true);
+              xhr.send( null);
+          }
+
+          function UpdateAlarms()          //display alarm status on browser list
+          {
+              var xhr = new XMLHttpRequest();
+              xhr.onreadystatechange = function()
+              {
+                  if( xhr.readyState == XMLHttpRequest.DONE)
+                  {
+                    //   alert( xhr.responseText);
+                       document.getElementById( "alarmDisp").innerHTML = xhr.responseText;
+                  }
+              }
+
+              xhr.open( 'GET', "alarmVal", true);
+              xhr.send( null);
+          }
+
+        //   function UpdateLeds()          //display browser LEDs
+        //   {
+        //       var xhr = new XMLHttpRequest();
+        //       xhr.onreadystatechange = function()
+        //       {
+        //           if( xhr.readyState == XMLHttpRequest.DONE)
+        //           {
+        //             //   alert( xhr.responseText);
+        //               if( xhr.responseText == '1')
+        //               {
+        //                     htmlStr = "<div class=" + "led-green" + "></div></div><p>Fault LED</p>";
+        //                     document.getElementsByClassName( "led-fault")[0].innerHTML = htmlStr;
+        //               }
+        //               else
+        //               {
+        //                     htmlStr = "<div class=" + "led-grey" + "></div><p>Fault LED</p>";
+        //                     document.getElementsByClassName( "led-fault")[0].innerHTML = htmlStr;
+        //               }
+        //           }
+        //       }
+
+        //       xhr.open( 'GET', "ledVals", true);
+        //       xhr.send( null);
+        //   }
+
+          function UpdateCabType()          //display alarm status on browser LEDs
+          {
+              var xhr = new XMLHttpRequest();
+              var dispStr = 'received: ';
+              xhr.onreadystatechange = function()
+              {
+                  if( xhr.readyState == XMLHttpRequest.DONE)
+                  {
+                    //   alert( dispStr);
+                       cabType = xhr.responseText;
+                      if( cabType == "RAU")
+                          $("#includeTable").load("rauTable.html");    //a table of DRCs on the RAU browser
+                      else
+                          $("#includeTable").load("drcTable.html");    //a table for entering information pertinent to the DRC
+                  }
+              }
+
+              xhr.open( 'GET', "cabType", true);
+              xhr.send( null);
+          }
+
+          function RestartSystem()          //restart the RFS Software
+          {
+              var xhr = new XMLHttpRequest();
+              xhr.onreadystatechange = function()
+              {
+                  if( xhr.readyState == XMLHttpRequest.DONE)
+                  {
+//                       alert( xhr.responseText);
+                       document.getElementById( "restart").innerHTML = xhr.responseText;
+                       var intrvlRvrt=self.setTimeout( RevertRefreshButton, 25000);     // give the system a chance to boot up again, then revert the button text
+                  }
+              }
+
+              xhr.open( 'GET', "restartSys", true);
+              xhr.send( null);
+          }
+
+          function RevertRefreshButton()          //revert button text after Restart
+          {
+             var xhr = new XMLHttpRequest();
+             xhr.onreadystatechange = function()
+             {
+                 if( xhr.readyState == XMLHttpRequest.DONE)
+                 {
+//                       alert( xhr.responseText);
+                      document.getElementById( "restart").innerHTML = xhr.responseText;
+                 }
+             }
+
+             xhr.open( 'GET', "revertRestartBtn", true);
+             xhr.send( null);
+          }
+
+          $( function()
+          {
+              var $winHeight = $( window ).height()/10;
+              $( '.container' ).height( $winHeight );
+          });
+
+          //handle file upload
+          var form = document.getElementById( 'file-form');
+          var fileSelect = document.getElementById( 'fileSelect');
+          var uploadButton = document.getElementById( 'upload-button');
+          form.onsubmit = function( event)
+          {
+              if( fileSelect.value === "")
+              {
+                  alert( "Please enter a file");
+                  event.preventDefault();              //prevent form submission
+                  return;
+              }
+
+              event.preventDefault();
+
+              // Get the selected files from the input.
+              var files = fileSelect.files;
+
+              // Create a new FormData object.
+              var formData = new FormData();
+
+              // Loop through each of the selected files.
+              var totObjs = 0;
+              for( var i=0; i<files.length; i++)
+              {
+                  var file = files[i];
+
+                  // Check the file type.
+                //   if( !file.type.match( '.+\.pdf')) //only allow this type of file
+                //   {
+                //       continue;
+                //   }
+
+                  // Add the file to the request.
+                  formData.append( 'photos', file, file.name);
+                  totObjs += 1;
+              }
+
+//              myStr = totObjs + " files found"
+//              alert( myStr);
+              if( totObjs < 1)
+              {
+                  alert( "no meaningful files to upload");
+                  event.preventDefault();              //prevent form submission
+                  return;
+              }
+              else
+              {
+                  uploadButton.innerHTML = 'Uploading...';    // Update button text.
+              }
+
+              // Set up the request.
+              var xhr = new XMLHttpRequest();
+
+              // Open the connection.
+              xhr.open( 'POST', 'fileLoad', true);
+
+              // Set up a handler for when the request finishes.
+              xhr.onload = function()
+              {
+                  if( xhr.status === 200)
+                  {
+                       // File(s) uploaded.
+                       uploadButton.innerHTML = 'Upload';
+                  }
+                  else
+                  {
+                       alert( 'An error occurred!');
+                  }
+              };
+
+              // Send the Data.
+              xhr.send( formData);
+              setTimeout( function(){ $( "#fileSelect" ).val("");}, 1000);              //clear the filename field
+          }
+
+        //   var a2dRunning = true;                              //set to false when a2d stopped
+          var intrvlA2D=self.setInterval( UpdateA2D, 900);
+          var intrvlAlarm=self.setInterval( UpdateAlarms, 1000);
+        //   var intrvlLeds=self.setInterval( UpdateLeds, 1100);
+          var intrvlSwVers=self.setInterval( UpdateSwVers, 1100);
+          cabType=self.setTimeout( UpdateCabType, 100);   //cabinet type, do this once
+      </script>
+
+<script class="jsdom" src="/var/lib/cloud9/RfSolutions/node_modules/jquery/dist/jquery.js"></script></body></html>
